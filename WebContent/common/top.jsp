@@ -29,7 +29,7 @@
 <body>
 
 <div id="logo">
-	<img src="images/logo.gif" width="118" height="50" />
+	<!-- <img src="images/logo.gif" width="118" height="50" /> -->
 </div>
 <div class="help">
 	<c:choose>

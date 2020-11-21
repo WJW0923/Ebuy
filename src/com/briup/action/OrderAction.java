@@ -32,35 +32,43 @@ import com.briup.util.ResponseUtil;
 import com.briup.util.StringUtil;
 import com.opensymphony.xwork2.ActionSupport;
 
-
+/**
+ * 订单Action类
+ * @author Administrator
+ *
+ */
 @Controller
 public class OrderAction extends ActionSupport implements ServletRequestAware{
 
-	
+	/**
+	 * 
+	 */
 	private static final long serialVersionUID = 1L;
 
 	private HttpServletRequest request;
 	
-	
+	/**
+	 * 订单Service
+	 */
 	@Resource
 	private OrderService orderService;
 	
-	private Order s_order; 
+	private Order s_order; // 订单查询
 	
 
 	
 	private String navCode;
 	
-	private String mainPage;
+	private String mainPage; // 主页
 	
-	private List<Order> orderList;
+	private List<Order> orderList; // 订单集合
 	
-	private int status; //״̬
-	private String orderNo; 
+	private int status; // 订单状态
+	private String orderNo; // 订单号
 	
-	private String page; 
+	private String page;  // 商品 第几页
 	private String rows;
-	private Long total; 
+	private Long total; // 商品 总记录数
 	
 	private String orderNos;
 	
@@ -158,14 +166,18 @@ public class OrderAction extends ActionSupport implements ServletRequestAware{
 		this.orderNos = orderNos;
 	}
 
-	
+	/**
+	 * 保存订单
+	 * @return
+	 * @throws Exception
+	 */
 	public String save()throws Exception{
-		
+		//获取Session
 		HttpSession session=request.getSession();
 		Order order=new Order();
-		
+		//从Session中获取当前用户
 		User currentUser=(User) session.getAttribute("currentUser");
-	
+		//设置订单
 		order.setUser(currentUser);
 		order.setCreateTime(new Date());
 		order.setOrderNo(DateUtil.getCurrentDateStr());
@@ -176,7 +188,7 @@ public class OrderAction extends ActionSupport implements ServletRequestAware{
 		List<OrderProduct> orderProductList=new LinkedList<OrderProduct>();
 		
 		float cost=0;
-	
+		//遍历购物车项
 		for(ShoppingCartItem shoppingCartItem:shoppingCartItemList){
 			Product product=shoppingCartItem.getProduct();
 			OrderProduct orderProduct=new OrderProduct();
@@ -187,37 +199,45 @@ public class OrderAction extends ActionSupport implements ServletRequestAware{
 			orderProductList.add(orderProduct);
 			
 		}
-		
+		//将订单商品加入到订单
 		order.setCost(cost);
 		order.setStatus(1);
 		order.setOrderProductList(orderProductList);
-		navCode=NavUtil.genNavCode("购物车");
+		navCode=NavUtil.genNavCode("购物");
 		mainPage="shopping/shopping-result.jsp";
-		
+		//保存订单
 		orderService.saveOrder(order);
 		
 
-		// ﳵ
+		// 清空购物车
 		session.removeAttribute("shoppingCart");
 		return SUCCESS;
 	}
 	
-	
+	/**
+	 * 查询订单
+	 * @return
+	 * @throws Exception
+	 */
 	public String findOrder()throws Exception{
 		HttpSession session=request.getSession();
-	
+		//从Session中获取当前用户
 		User currentUser=(User) session.getAttribute("currentUser");
 		if(s_order==null){
 			s_order=new Order();
 		}
 		s_order.setUser(currentUser);
 		orderList=orderService.findOrderList(s_order,null);
-		navCode=NavUtil.genNavCode("订单列表");
+		navCode=NavUtil.genNavCode("个人中心");
 		mainPage="userCenter/orderList.jsp";
 		return "orderList";
 	}
 	
-	
+	/**
+	 * 确认收货
+	 * @return
+	 * @throws Exception
+	 */
 	public String confirmReceive()throws Exception{
 		orderService.updateOrderStatus(status,orderNo);
 		JSONObject result=new JSONObject();
@@ -226,7 +246,11 @@ public class OrderAction extends ActionSupport implements ServletRequestAware{
 		return null;
 	}
 	
-	
+	/**
+	 * 查询订单集合
+	 * @return
+	 * @throws Exception
+	 */
 	public String list()throws Exception{
 		PageBean pageBean=new PageBean(Integer.parseInt(page),Integer.parseInt(rows));
 		List<Order> orderList=orderService.findOrderList(s_order, pageBean);
@@ -243,7 +267,11 @@ public class OrderAction extends ActionSupport implements ServletRequestAware{
 		return null;
 	}
 	
-	
+	/**
+	 * 通过订单号查询商品集合
+	 * @return
+	 * @throws Exception
+	 */
 	public String findProductListByOrderId()throws Exception{
 		if(StringUtil.isEmpty(orderNo)){
 			orderNo = request.getParameter("id");
@@ -271,7 +299,11 @@ public class OrderAction extends ActionSupport implements ServletRequestAware{
 		return null;
 	}
 	
-	
+	/**
+	 * 修改订单状态
+	 * @return
+	 * @throws Exception
+	 */
 	public String modifyOrderStatus()throws Exception{
 		String []orderNosStr=orderNos.split(",");
 		for(int i=0;i<orderNosStr.length;i++){

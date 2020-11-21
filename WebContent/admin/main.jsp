@@ -96,7 +96,7 @@
 	<table style="padding: 5px" width="100%">
 		<tr>
 			<td width="50%">
-				<img src="${pageContext.request.contextPath}/images/logo.gif" width=150 height=60/>
+				<%-- <img src="${pageContext.request.contextPath}/images/logo.gif" width=150 height=60/> --%>
 			</td>
 			<td valign="bottom" align="right" width="50%">
 				<font size="3">&nbsp;&nbsp;<strong>欢迎：</strong>${currentUser.userName }</font>
